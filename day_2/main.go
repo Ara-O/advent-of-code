@@ -46,7 +46,7 @@ func main() {
 
 	scanner := bufio.NewScanner(file)
 
-	red, green, blue := 12, 13, 14
+	// red, green, blue := 12, 13, 14
 	games := &map[string]string{}
 
 	for scanner.Scan() {
@@ -59,11 +59,13 @@ func main() {
 
 	fmt.Println(allGames)
 
-	impossibleGameKeys := []string{}
+	lowestPerKey := map[string]int{}
 
 	// Format: 1: "1 red, 4 blue; 4 red, 5 green"
 	for key, value := range *games {
 		splitSectionsPerGame := strings.Split(value, ";")
+
+		lowestGreen, lowestRed, lowestBlue := 0, 0, 0
 
 		for _, section := range splitSectionsPerGame {
 			rgbValues := strings.Split(section, ", ")
@@ -85,46 +87,36 @@ func main() {
 				switch true {
 				case color[0] == 'r':
 					fmt.Println("Red - ", numOfCube)
-					if numOfCube > red {
-						fmt.Println("Red is over")
-						impossibleGameKeys = append(impossibleGameKeys, key)
+					if numOfCube > lowestRed {
+						lowestRed = numOfCube
 					}
 				case color[0] == 'g':
 					fmt.Println("Green", numOfCube)
-					if numOfCube > green {
-						impossibleGameKeys = append(impossibleGameKeys, key)
-						fmt.Println("Green is over")
+					if numOfCube > lowestGreen {
+						lowestGreen = numOfCube
 					}
 				case color[0] == 'b':
 					fmt.Println("Blue", numOfCube)
-					if numOfCube > blue {
-						impossibleGameKeys = append(impossibleGameKeys, key)
-						fmt.Println("Blue is over")
+					if numOfCube > lowestBlue {
+						lowestBlue = numOfCube
 					}
 				}
 			}
 			fmt.Println("====")
 		}
+
+		fmt.Println(lowestRed, " - ", lowestGreen, " - ", lowestBlue)
+		lowestPerKey[key] = lowestRed * lowestGreen * lowestBlue
 		// fmt.Println(key, " ", value, " -- ", splitSectionsPerGame)
 	}
 
-	fmt.Println(impossibleGameKeys)
+	fmt.Println(lowestPerKey)
 
-	// allGamesStr := strings.Join(allGames, " ")
-	// for _, key := range impossibleGameKeys {
-	// 	fmt.Println(key)
-	// 	allGamesStr = strings.ReplaceAll(allGamesStr, key, "")
-	// }
+	totes := 0
+	for _, val := range lowestPerKey {
+		totes += val
+	}
 
-	// total := 0
-	// for _, val := range strings.Split(allGamesStr, " ") {
-	// 	if num, err := strconv.Atoi(val); err == nil {
-	// 		total += num
-	// 	}
-	// }
-
-	impossibleGameKeys = removeDuplicates(impossibleGameKeys)
-	fmt.Println(allGames)
-	fmt.Println(impossibleGameKeys)
+	fmt.Println("TOTES", totes)
 	// fmt.Println("FINAL ", total)
 }
